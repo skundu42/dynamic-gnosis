@@ -1,34 +1,147 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Gnosis x Dynamic dapp
 
-## Getting Started
+![Primary](/1.png)
 
-First, run the development server:
 
-```bash
+This is a basic dapp which demonstrates the integration of Dynamic wallet with Gnosis chain and to generate offchain user signatures.
+
+This will let Gnosis onboard users who don't even have a wallet installed. Email + Passkeys is all they need.
+
+
+## Steps to run this application
+- Clone this repository
+- Install npm packages
+```
+npm i
+```
+- Run a NextJs dev server
+```
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Tech Components Used:
+- NextJS
+- Dynamic Labs SDK
+- Ant Design Library
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Detailed Guide
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- Create a NextJs application from scratch
 
-## Learn More
+```
+npx create-next-app dynamic-gnosis
+# install with Tailwind
+```
+- Install Dynamic labs SDK & some other dependencies
 
-To learn more about Next.js, take a look at the following resources:
+```
+npm install @dynamic-labs/ethereum @dynamic-labs/ethers-v6 @dynamic-labs/sdk-react-core
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Create an account at [Dynamic Web App](https://app.dynamic.xyz/) and choose the Ethereum Sandbox option.
+In the dashboard, enable the networks you want to allow your users. For our example we will enable Gnosis network. Also make sure you have Email as an authentication enabled for your users. This helps create a wallet just using user's email.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- In the [developers section](https://app.dynamic.xyz/dashboard/developer/api), copy the Environment ID, we will need this in the next step.
 
-## Deploy on Vercel
+- Initialize the SDK in your **layout.tsx** file like this. The goal is to initialize the SDK as early as possible when loading you application. Put your Environment ID in the proper variable.
+Make sure you have **EthersExtension** also added in the extensions variable, this will be useful later!
+```
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <DynamicContextProvider
+        settings={{
+          environmentId: "<Replace with you own Environment ID>",
+          walletConnectors: [EthereumWalletConnectors],
+          walletConnectorExtensions: [EthersExtension],
+        }}
+      >
+        <body className={inter.className}>{children}</body>
+      </DynamicContextProvider>
+    </html>
+  );
+}
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Now let's build out a simple application!
+
+- Install ant-design library for some good UI
+```
+npm install antd
+```
+
+- Create a components folder and inside that create a component **DynamicWidgetButton.tsx** and here we need to declare our DynamicWidget component provided to us by Dynamic SDK.
+
+```
+export const DynamicWidgetButton: React.FC = () => {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '20px' }}>
+      <Title level={3} style={{ marginBottom: '20px' }}>Wallet Interaction</Title>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <DynamicWidget />
+      </div>
+    </div>
+  );
+};
+
+```
+
+- Now we can use and initialize the Dynamic wallet anywhere in our app by just using the above component!
+
+- Let's create our Main component in **page.tsx** file.
+
+In this file, we will **useDynamicContext** provided by the dynamic sdk to fetch the wallet connected. We will also use this same wallet to execute all our ethers expression.
+
+```
+  const { primaryWallet } = useDynamicContext();
+```
+
+- In our application, we have built a basic **Signer** component which uses the connected Dynamic wallet to generate a signature from the user.
+
+
+```
+  const signMessage = async () => {
+    if (!primaryWallet) {
+      console.error("No primary wallet connected");
+      return;
+    }
+
+    try {
+      const signedMessage = await primaryWallet.connector.signMessage('You are signing an example message');
+      if (signedMessage) {
+        setSignature(signedMessage);
+      } else {
+        setSignature(null);
+      }
+    } catch (error) {
+      console.error("Error signing message:", error);
+      setSignature(null);
+    }
+  };
+```
+
+You can also see that the **signMessage** function is provided by the  Dynamic SDK.  So cool!
+
+## Using ethers
+
+The last piece of component, I want to discuss is the **getBalance** component. Although Dybamic also gives a component to fetch user balance, this function is created to demonstrate how you can use standard ethers expression to build out your app further.
+
+And that's it!!!
+
+You can check out the repository for the full code along with the right imports.
+
+Here are some other images of the wallet in action!
+
+## Primary Screen
+![Alt text](/2.png)
+
+## Onboard users with email
+![Alt text](/3.png)
+
+
+Note: If you get any errors for any packcage missing, look into the package.json file of this repo and compare with yours.

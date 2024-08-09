@@ -18,12 +18,11 @@ export default function Main() {
     }
 
     const provider = await primaryWallet.connector?.ethers?.getRpcProvider();
-  
+    
     if (!provider) {
       console.error("No provider available");
       return null;
     }
-
     try {
       const balance = await provider.getBalance(primaryWallet.address);
       console.log(balance);
