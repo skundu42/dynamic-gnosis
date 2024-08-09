@@ -1,6 +1,6 @@
 # Gnosis x Dynamic dapp
 
-![Primary](/1.png)
+![Primary](/images/1.png)
 
 
 This is a basic dapp which demonstrates the integration of Dynamic wallet with Gnosis chain and to generate offchain user signatures.
@@ -131,6 +131,31 @@ You can also see that the **signMessage** function is provided by the  Dynamic S
 
 The last piece of component, I want to discuss is the **getBalance** component. Although Dybamic also gives a component to fetch user balance, this function is created to demonstrate how you can use standard ethers expression to build out your app further.
 
+```
+  const getBalance = async () => {
+    if (!primaryWallet) {
+      console.error("No primary wallet connected");
+      return null;
+    }
+
+    const provider = await primaryWallet.connector?.ethers?.getRpcProvider();
+    
+    if (!provider) {
+      console.error("No provider available");
+      return null;
+    }
+    try {
+      const balance = await provider.getBalance(primaryWallet.address);
+      console.log(balance);
+      return balance;
+    } catch (error) {
+      console.error("Error getting balance:", error);
+      return null;
+    }
+  };
+
+```
+
 And that's it!!!
 
 You can check out the repository for the full code along with the right imports.
@@ -138,10 +163,10 @@ You can check out the repository for the full code along with the right imports.
 Here are some other images of the wallet in action!
 
 ## Primary Screen
-![Alt text](/2.png)
+![Alt text](/images/2.png)
 
 ## Onboard users with email
-![Alt text](/3.png)
+![Alt text](/images/3.png)
 
 
 Note: If you get any errors for any packcage missing, look into the package.json file of this repo and compare with yours.
