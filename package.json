@@ -12,7 +12,7 @@
     "@dynamic-labs/ethereum": "*",
     "@dynamic-labs/ethers-v6": "^2.3.8",
     "@dynamic-labs/sdk-react-core": "*",
-    "@types/node": "20.5.4",
+    "@types/node": "22.2.0",
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
     "antd": "^5.20.0",
