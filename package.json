@@ -27,6 +27,6 @@
     "typescript": "5.2.2"
   },
   "devDependencies": {
-    "@babel/preset-typescript": "^7.24.7"
+    "@babel/preset-typescript": "^7.26.0"
   }
 }
